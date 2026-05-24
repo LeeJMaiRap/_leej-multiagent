@@ -11,6 +11,7 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 const PORT = process.env.PORT || 20129;
 
+// TODO: Session-first refactor - split runtime state, artifacts, mailbox, reviews, routes, and sockets into session services.
 const uploadDir = path.join(__dirname, 'uploads');
 const runsDir = path.join(__dirname, 'runs');
 const stateFile = path.join(__dirname, 'state.json');
@@ -69,6 +70,7 @@ function saveStateNow() {
 process.on('SIGINT', () => { saveStateNow(); process.exit(0); });
 process.on('SIGTERM', () => { saveStateNow(); process.exit(0); });
 
+// TODO: Session-first refactor - move this dashboard demo flow behind a DemoSessionBridge adapter.
 const flowSteps = [
   { key: 'REQ_ACK', agentId: 'requirements', status: 'working', text: 'ACK: nhận task từ PM', delayMs: 500 },
   { key: 'REQ_WORK', agentId: 'requirements', status: 'working', text: 'WORKING: phân tích scope + acceptance', delayMs: 1500 },

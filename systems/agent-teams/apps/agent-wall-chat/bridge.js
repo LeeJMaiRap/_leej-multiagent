@@ -3,6 +3,7 @@
 // session bindings and falls back to local orchestration when direct tool
 // routing is unavailable from this web process.
 
+// TODO: Session-first refactor - promote this to a real SessionBridge contract with local and real adapters.
 class SessionBridge {
   constructor() {
     this.mode = process.env.AGENT_WALL_BRIDGE_MODE || 'local-fallback';
