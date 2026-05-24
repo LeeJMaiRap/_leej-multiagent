@@ -5,6 +5,6 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "build": "node --check src/issue-api.js && node --check src/issue-ui.js && node --check tests/*.test.js"
+    "build": "node --check src/issue-api.js && node --check src/issue-ui.js && node --check tests/issue-api.test.js && node --check tests/issue-ui.test.js"
   }
 }

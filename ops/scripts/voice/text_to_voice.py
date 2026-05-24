@@ -3,12 +3,25 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import os
 import pathlib
 import subprocess
+import sys
 import time
 
-DEFAULT_VENV = pathlib.Path('/root/.openclaw/workspace/.venvs/voice-stack')
-DEFAULT_OUTPUT_DIR = pathlib.Path('/root/.openclaw/workspace/ops/tmp/voice/generated')
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
+DEFAULT_VENV = REPO_ROOT / '.venvs' / 'voice-stack'
+DEFAULT_OUTPUT_DIR = REPO_ROOT / 'ops' / 'tmp' / 'voice' / 'generated'
+
+
+def env_path(name: str, default: pathlib.Path) -> pathlib.Path:
+    return pathlib.Path(os.environ.get(name, str(default))).expanduser()
+
+
+def venv_executable(venv: pathlib.Path, executable: str) -> pathlib.Path:
+    scripts_dir = 'Scripts' if sys.platform == 'win32' else 'bin'
+    suffix = '.exe' if sys.platform == 'win32' else ''
+    return venv / scripts_dir / f'{executable}{suffix}'
 DEFAULT_VOICE = 'vi-VN-HoaiMyNeural'
 FALLBACK_VOICES = ['vi-VN-HoaiMyNeural', 'vi-VN-NamMinhNeural']
 
@@ -19,7 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument('--input-file', help='Path to text file to synthesize.')
     p.add_argument('--voice', default=DEFAULT_VOICE, help='Primary Edge TTS voice name.')
     p.add_argument('--name', default='voice-output', help='Base name for output files.')
-    p.add_argument('--output-dir', default=str(DEFAULT_OUTPUT_DIR), help='Directory for generated files.')
+    p.add_argument('--output-dir', default=str(env_path('VOICE_GENERATED_DIR', DEFAULT_OUTPUT_DIR)), help='Directory for generated files.')
     p.add_argument('--keep-mp3', action='store_true', help='Keep intermediate mp3 file.')
     p.add_argument('--retries', type=int, default=2, help='Retries per voice if provider returns no audio.')
     return p
@@ -73,9 +86,10 @@ def main() -> int:
     ogg_path = output_dir / f'{base}.ogg'
     meta_path = output_dir / f'{base}.txt'
 
-    edge_tts = DEFAULT_VENV / 'bin' / 'edge-tts'
+    venv_path = env_path('VOICE_STACK_VENV', DEFAULT_VENV)
+    edge_tts = env_path('EDGE_TTS_BIN', venv_executable(venv_path, 'edge-tts'))
     if not edge_tts.exists():
-        raise SystemExit(f'edge-tts not found at {edge_tts}')
+        raise SystemExit(f'edge-tts not found at {edge_tts}; set EDGE_TTS_BIN or VOICE_STACK_VENV')
 
     attempts_log: list[str] = []
     selected_voice: str | None = None
@@ -107,8 +121,9 @@ def main() -> int:
         )
         raise SystemExit(f'edge-tts failed after retries; see {meta_path}')
 
+    ffmpeg_bin = os.environ.get('FFMPEG_BIN', 'ffmpeg')
     ffmpeg_result = subprocess.run(
-        ['ffmpeg', '-y', '-i', str(mp3_path), '-c:a', 'libopus', str(ogg_path)],
+        [ffmpeg_bin, '-y', '-i', str(mp3_path), '-c:a', 'libopus', str(ogg_path)],
         capture_output=True,
         text=True,
         check=False,

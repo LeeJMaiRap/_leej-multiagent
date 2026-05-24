@@ -2,11 +2,17 @@
 from __future__ import annotations
 
 import argparse
+import os
 import pathlib
 import subprocess
 import sys
 
-DEFAULT_TTS_SCRIPT = pathlib.Path('/root/.openclaw/workspace/ops/scripts/voice/text_to_voice.py')
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
+DEFAULT_TTS_SCRIPT = REPO_ROOT / 'ops' / 'scripts' / 'voice' / 'text_to_voice.py'
+
+
+def env_path(name: str, default: pathlib.Path) -> pathlib.Path:
+    return pathlib.Path(os.environ.get(name, str(default))).expanduser()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -42,9 +48,14 @@ def main() -> int:
         raise SystemExit('Input text is empty')
 
     voice_script = shorten_for_voice(text)
+    tts_script = env_path('VOICE_TTS_SCRIPT', DEFAULT_TTS_SCRIPT)
+    if not tts_script.exists():
+        raise SystemExit(f'TTS script not found: {tts_script}; set VOICE_TTS_SCRIPT')
+
     result = subprocess.run(
         [
-            str(DEFAULT_TTS_SCRIPT),
+            sys.executable,
+            str(tts_script),
             '--text', voice_script,
             '--name', args.name,
             '--voice', args.voice,

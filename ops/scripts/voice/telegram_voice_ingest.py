@@ -2,14 +2,20 @@
 from __future__ import annotations
 
 import argparse
+import os
 import pathlib
 import re
 import subprocess
 import sys
 from typing import Tuple
 
-DEFAULT_STT_SCRIPT = pathlib.Path('/root/.openclaw/workspace/ops/scripts/voice/voice_to_text.py')
-DEFAULT_TRANSCRIPT_DIR = pathlib.Path('/root/.openclaw/workspace/ops/tmp/voice/transcripts')
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
+DEFAULT_STT_SCRIPT = REPO_ROOT / 'ops' / 'scripts' / 'voice' / 'voice_to_text.py'
+DEFAULT_TRANSCRIPT_DIR = REPO_ROOT / 'ops' / 'tmp' / 'voice' / 'transcripts'
+
+
+def env_path(name: str, default: pathlib.Path) -> pathlib.Path:
+    return pathlib.Path(os.environ.get(name, str(default))).expanduser()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -81,16 +87,20 @@ def main() -> int:
     audio_path = pathlib.Path(args.audio)
     if not audio_path.exists():
         raise SystemExit(f'Audio file not found: {audio_path}')
-    if not DEFAULT_STT_SCRIPT.exists():
-        raise SystemExit(f'STT script not found: {DEFAULT_STT_SCRIPT}')
+    stt_script = env_path('VOICE_STT_SCRIPT', DEFAULT_STT_SCRIPT)
+    if not stt_script.exists():
+        raise SystemExit(f'STT script not found: {stt_script}; set VOICE_STT_SCRIPT')
+    transcript_dir = env_path('VOICE_TRANSCRIPT_DIR', DEFAULT_TRANSCRIPT_DIR)
 
     result = subprocess.run(
         [
-            str(DEFAULT_STT_SCRIPT),
+            sys.executable,
+            str(stt_script),
             str(audio_path),
             '--language', args.language,
             '--model', args.model,
             '--name', args.name,
+            '--output-dir', str(transcript_dir),
         ],
         capture_output=True,
         text=True,
