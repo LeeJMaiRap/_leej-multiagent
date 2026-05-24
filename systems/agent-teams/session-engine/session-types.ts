@@ -76,6 +76,8 @@ export interface TaskPacket {
   inputs: string[]
   outputs: string[]
   instructions: string
+  startedAt?: string
+  completedAt?: string
   reportPath?: string
 }
 
@@ -105,6 +107,7 @@ export interface Session {
   mode: SessionMode
   workflowType?: WorkflowType
   status: SessionStatus
+  blockedReason?: string
   title: string
   createdAt: string
   updatedAt: string
@@ -114,7 +117,7 @@ export interface Session {
   taskPackets: TaskPacket[]
   gates: SessionGate[]
   projectPath: string
-  chatHistory: ChatMessage[]
+  chatHistoryPath: string
 }
 
 // Chat message đơn giản
@@ -123,4 +126,9 @@ export interface ChatMessage {
   agentRole?: AgentRole
   content: string
   timestamp: string
+}
+
+// Dùng khi đọc/ghi chat-history.jsonl
+export interface ChatHistoryEntry extends ChatMessage {
+  sessionId: string
 }

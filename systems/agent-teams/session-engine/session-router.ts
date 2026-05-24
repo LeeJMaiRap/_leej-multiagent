@@ -2,7 +2,7 @@
 // ECC references emphasize plan/execute separation, code sovereignty, explicit validation, and stop-loss gates before moving phases.
 // PM Agent workflow defines PM as orchestrator-only in Agent-Teams mode, with requirements, architecture/API, ownership, execution, QA/integration, and handoff gates.
 
-import type { Session, SessionMode, WorkflowType, WebAppIntakeForm } from './session-types'
+import type { AgentRole, Session, SessionMode, WorkflowType, WebAppIntakeForm } from './session-types'
 
 /**
  * SessionRouter — điều hướng giữa Normal Chat và Workflow Session
@@ -50,7 +50,7 @@ export async function checkGate(
 // Dispatch agent chạy task (manual trigger)
 export async function dispatchAgent(params: {
   sessionId: string
-  agentRole: string
+  agentRole: AgentRole
   taskPacketId: string
 }): Promise<void> {
   void params
