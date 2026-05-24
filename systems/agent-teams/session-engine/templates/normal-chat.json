@@ -1,5 +1,9 @@
 {
   "id": "normal-chat",
-  "label": "Normal Chat",
-  "todo": "Session Engine — TODO"
+  "label": "Trò chuyện thường",
+  "description": "Chat mode thông thường, không tạo project",
+  "leadAgent": null,
+  "agents": [],
+  "gates": [],
+  "requiredArtifacts": []
 }

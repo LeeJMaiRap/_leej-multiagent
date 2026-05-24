@@ -1,5 +1,51 @@
 {
   "id": "web-app-project",
   "label": "Tạo dự án web/app",
-  "todo": "Session Engine — TODO"
+  "description": "Workflow đầy đủ từ intake → requirements → architecture → implementation → QA",
+  "leadAgent": "pm-agent",
+  "agents": [
+    "requirements-agent",
+    "architecture-agent",
+    "api-contract-agent",
+    "frontend-agent",
+    "backend-agent",
+    "qa-agent",
+    "integration-agent"
+  ],
+  "gates": [
+    { "id": "gate-1", "label": "Requirements rõ ràng", "requiredArtifacts": ["requirements.md"] },
+    { "id": "gate-2", "label": "Architecture được duyệt", "requiredArtifacts": ["architecture.md"] },
+    { "id": "gate-3", "label": "API contract được duyệt", "requiredArtifacts": ["api-contract.md"] },
+    { "id": "gate-4", "label": "Ownership map rõ", "requiredArtifacts": ["ownership-map.md"] },
+    { "id": "gate-5", "label": "Task packets sẵn sàng", "requiredArtifacts": ["task-packets/"] },
+    { "id": "gate-6", "label": "Implementation verified", "requiredArtifacts": ["agent-reports/"] },
+    { "id": "gate-7", "label": "Integration verified", "requiredArtifacts": ["integration-report.md"] },
+    { "id": "gate-8", "label": "PM acceptance", "requiredArtifacts": ["handoff.md"] }
+  ],
+  "requiredArtifacts": [
+    "00-intake/intake.md",
+    "01-requirements/requirements.md",
+    "02-architecture/architecture.md",
+    "03-contracts/api-contract.md",
+    "04-planning/ownership-map.md",
+    "04-planning/implementation-plan.md",
+    "05-execution/task-packets/",
+    "05-execution/agent-reports/",
+    "06-integration/integration-report.md",
+    "07-review/review-checklist.md",
+    "08-handoff/handoff.md"
+  ],
+  "projectFolderStructure": [
+    "00-intake/",
+    "01-requirements/",
+    "02-architecture/",
+    "03-contracts/",
+    "04-planning/",
+    "05-execution/task-packets/",
+    "05-execution/agent-reports/",
+    "06-integration/",
+    "07-review/",
+    "08-handoff/",
+    "09-retrospective/"
+  ]
 }
